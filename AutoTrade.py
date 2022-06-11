@@ -4,14 +4,20 @@ import pandas as pd
 from datetime import datetime
 from slacker import Slacker
 import time, calendar
+import requests
 
-
-slack = Slacker('xoxb-3504057626451-3504117030802-eTfYDLRuEelHr7yoSGfh0n0O')
+def post_message(token, channel, text):
+    response = requests.post("https://slack.com/api/chat.postMessage",
+        headers={"Authorization": "Bearer "+token},
+        data={"channel": channel,"text": text}
+    )
+ 
+myToken = "xoxb-3504057626451-3632859423412-mjlimriA2EoHMCx90GWBezM5"
 def dbgout(message):
     """인자로 받은 문자열을 파이썬 셸과 슬랙으로 동시에 출력한다."""
     print(datetime.now().strftime('[%m/%d %H:%M:%S]'), message)
     strbuf = datetime.now().strftime('[%m/%d %H:%M:%S] ') + message
-    slack.chat.post_message('#stock', strbuf)
+    post_message(myToken,"#stock", strbuf)
 
 def printlog(message, *args):
     """인자로 받은 문자열을 파이썬 셸에 출력한다."""
@@ -132,7 +138,7 @@ def get_target_price(code):
             today_open = lastday[3]
         lastday_high = lastday[1]
         lastday_low = lastday[2]
-        target_price = today_open + (lastday_high - lastday_low) * 0.5
+        target_price = today_open + (lastday_high - lastday_low) * 0.2
         return target_price
     except Exception as ex:
         dbgout("`get_target_price() -> exception! " + str(ex) + "`")
@@ -244,10 +250,10 @@ def sell_all():
 
 if __name__ == '__main__': 
     try:
-        symbol_list = ['A252670', 'A251340', 'A252710', 'A114800'] # 매수할 종목 코드
+        symbol_list = ['A217620', 'A001440', 'A003480', 'A273060']
         bought_list = []     # 매수 완료된 종목 리스트
         target_buy_count = 4 # 매수할 종목 수
-        buy_percent = 0.25 # 최대 몇 종목까지 매수를 몇 퍼센트 살건지 정하는 수  
+        buy_percent = 0.25
         printlog('check_creon_system() :', check_creon_system())  # 크레온 접속 점검
         stocks = get_stock_balance('ALL')      # 보유한 모든 종목 조회
         total_cash = int(get_current_cash())   # 100% 증거금 주문 가능 금액 조회
