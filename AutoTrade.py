@@ -6,6 +6,7 @@ from slacker import Slacker
 import time, calendar
 import requests
 
+
 def post_message(token, channel, text):
     response = requests.post("https://slack.com/api/chat.postMessage",
         headers={"Authorization": "Bearer "+token},
